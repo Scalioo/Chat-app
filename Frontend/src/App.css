@@ -1,0 +1,41 @@
+#root {
+  width: 100%;
+  margin: 0 ;
+  text-align: center;
+}
+
+*{
+  @apply m-0 w-full h-full
+}
+body{
+  width: 100vw;
+  height: 100vh;
+  background: rgb(10,71,60);
+  background: linear-gradient(0deg, rgba(10,71,60,1) 0%, rgba(14,40,35,1) 66%, rgba(24,33,31,1) 100%)
+}
+
+.input-container{
+  @apply flex flex-col gap-2 w-full h-full
+}
+.input-container label {
+  @apply w-fit h-fit pt-10 text-white
+}
+.input-container input{
+  @apply h-full bg-darkgreen text-white rounded-full opacity-80 pl-4 placeholder:px-1
+}
+.error{
+  @apply text-red-500 text-left text-xs w-fit pr-10 pt-[-30rem]
+}
+
+.Container{
+  @apply w-[25%] min-w-96 bg-formbg rounded-[37px] h-[70%]
+}
+
+@media (max-width: 600px) {
+  body{
+    background:#202D2C ;
+    width: 100vw ;
+    height: 100vh; /* Change to a different color for smaller screens */
+  }
+
+}
