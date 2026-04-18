@@ -1,6 +1,4 @@
-const corssetup = {
-    origin:"http://localhost:5173" , 
-    credentials: true  ,    
-    
-}
- module.exports = corssetup  
+export const corsConfig = {
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true,
+};

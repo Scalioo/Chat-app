@@ -50,7 +50,7 @@ const AddFriend = () => {
                actions.resetForm()   
                socket.emit("add_friend",
                values.username , 
-               ({errormessage , done , newfriend }:response_emit ) =>{
+               ({errormessage , done , message }:any ) =>{
                 if(!done){ 
                   setError(errormessage)
                   setTimeout(()=>{
@@ -58,7 +58,11 @@ const AddFriend = () => {
                   },3000)
                   return ;
                 }
-                  setfriends((prevfriends:any) => [newfriend, ...prevfriends])
+                  // Show success message
+                  setError(message || "Invite Sent!")
+                  setTimeout(()=>{
+                    setError('')
+                  },3000)
                   return ;
                }
                )

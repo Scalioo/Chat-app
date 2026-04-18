@@ -1,32 +1,28 @@
 import express, { Request, Response } from "express";
+import validateform from '../controllers/Authetication/validateform';
+import ratelimiter from '../controllers/Authetication/ratelimit';
+import { attemptlogin, attemptsignup } from "../controllers/Authetication/authcontrollers";
+import { getJwt, jwtVerify } from '../controllers/jwt/jwt';
 
-const validateform = require('../controllers/Authetication/validateform')
 const router = express.Router();
-const ratelimiter  = require('../controllers/Authetication/ratelimit')
-const {  attemptlogin , attemptsignup} = require("../controllers/Authetication/authcontrollers")
-const  LoginHandler  = require('../controllers/Authetication/LoginHandler')
-const { getJwt , jwtVerify } = require('../controllers/jwt/jwt')
-router
-    .route("/login")
-    .get(async (req : Request ,  res : Response) => {
-      const token = getJwt(req);
-    
-      if (!token) {
-        res.json({ loggedIn: false });
-        return;
-      }
-    
-      jwtVerify(token, process.env.JWT_SECRET)
-        .then( () => {
-          res.json({ loggedIn: true, token });
-        })
-        .catch(() => {
-          res.json({ loggedIn: false });
-        });
-    })
-    .post( validateform , ratelimiter(60,10) ,attemptlogin )
 
+router.route("/login")
+  .get(async (req: Request, res: Response) => {
+    const token = getJwt(req);
 
-router.post("/register", validateform , ratelimiter(60,10) , attemptsignup )
+    if (!token) {
+      return res.json({ loggedIn: false });
+    }
 
-module.exports = router;
+    try {
+      const decoded = await jwtVerify(token, process.env.JWT_SECRET!);
+      res.json({ loggedIn: true, token, ...decoded });
+    } catch (err) {
+      res.json({ loggedIn: false });
+    }
+  })
+  .post(validateform, ratelimiter(60, 10), attemptlogin);
+
+router.post("/register", validateform, ratelimiter(60, 10), attemptsignup);
+
+export default router;

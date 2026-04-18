@@ -1,22 +1,23 @@
-import { NextFunction , Request , Response } from "express"
+import { NextFunction, Request, Response } from "express";
+import redisClient from '../../redis';
 
-const redisClient = require('../../redis')
+const ratelimiter = (seconds: number, amount: number) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    const ip = req.socket.remoteAddress;
+    if (!ip) return next();
 
+    const results = await redisClient.multi().incr(ip).expire(ip, seconds).exec();
+    if (!results || !results[0]) return next();
 
+    // ioredis return format for exec is [[err, data], [err, data]]
+    const [err, count] = results[0] as [Error | null, number];
 
-const ratelimiter = (seconds : number , amount : number ) =>
-    async (req:Request , res:Response , next: NextFunction) =>{
-    const ip = req.socket.remoteAddress ; 
-    const [response]  = await redisClient.multi().incr(ip).expire(ip, seconds).exec()
-    console.log(response[1]);
-    
-    if (!(response[1] > amount )){
-        next()
-        return ;
+    if (err || !(count > amount)) {
+      next();
+      return;
     }
-    res.json({ loggedIn:false , status: "Slow down ! Try again in a minute "})
+    
+    res.json({ loggedIn: false, status: "Slow down! Try again in a minute" });
+  };
 
-
-}
-
-module.exports = ratelimiter
+export default ratelimiter;
