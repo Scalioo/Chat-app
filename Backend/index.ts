@@ -22,6 +22,7 @@ import {
 import { AuthenticatedSocket, ChatMessage } from "./types";
 
 const app: Express = express();
+app.set("trust proxy", 1);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: corsConfig

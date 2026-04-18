@@ -3,7 +3,7 @@ import redisClient from '../../redis';
 
 const ratelimiter = (seconds: number, amount: number) =>
   async (req: Request, res: Response, next: NextFunction) => {
-    const ip = req.socket.remoteAddress;
+    const ip = req.ip;
     if (!ip) return next();
 
     const results = await redisClient.multi().incr(ip).expire(ip, seconds).exec();
